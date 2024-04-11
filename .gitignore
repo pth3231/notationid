@@ -1,5 +1,8 @@
 # Ignore all notebooks and data
-# ./models/*
+models/
 
 # Ignore Visual Studio Code Workspace
 *.code-workspace
+
+# Ignore all files in ./server/bin
+server/bin/
