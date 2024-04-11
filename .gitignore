@@ -1,4 +1,4 @@
-# Ignore all notebooks and data
+# Ignore all data
 models/
 
 # Ignore Visual Studio Code Workspace
