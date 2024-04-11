@@ -1,0 +1,5 @@
+# Ignore all notebooks and data
+./notebooks
+
+# Ignore Visual Studio Code Workspace
+*.code-workspace
