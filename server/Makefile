@@ -1,4 +1,5 @@
 main:
+	cls
 	cl .\src\main.cpp /Fe: main.exe /Zi /fsanitize=address
 	move main.exe .\bin
 	move main.obj .\bin
