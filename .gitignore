@@ -6,3 +6,8 @@ models/
 
 # Ignore all files in ./server/bin
 server/bin/
+
+# Ignore files in test
+server/test/test.exe
+server/test/test.obj
+server/test/test.pdb

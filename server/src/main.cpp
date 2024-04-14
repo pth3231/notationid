@@ -7,8 +7,7 @@
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
 #include <stdio.h>
-#include <string>
-#include <string.h>
+#include "../lib/cjson/cJSON.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -100,20 +99,19 @@ int main()
 
     printf("socket is listening at port %s...\n", DEFAULT_PORT);
 
-    // Create another SOCKET to handle client connection
-    SOCKET accept_socket = INVALID_SOCKET;
-    if ((accept_socket = accept(listen_socket, NULL, NULL)) == INVALID_SOCKET)
-    {
-        printf("failed to accept: %d\n", WSAGetLastError());
-        closesocket(listen_socket);
-        WSACleanup();
-        return 1;
-    }
-
     while (true)
     {
+        // Create another SOCKET to handle client connection
+        SOCKET accept_socket = INVALID_SOCKET;
+        if ((accept_socket = accept(listen_socket, NULL, NULL)) == INVALID_SOCKET)
+        {
+            printf("failed to accept: %d\n", WSAGetLastError());
+            closesocket(listen_socket);
+            WSACleanup();
+            return 1;
+        }
         // Refill the buffer with DEFAULT_BUFLEN NULL characters
-        char buffer[DEFAULT_BUFLEN] = { NULL };
+        char buffer[DEFAULT_BUFLEN] = {NULL};
 
         // Send data to the Client
         int req = recv(accept_socket, buffer, sizeof(buffer), 0);
@@ -122,8 +120,10 @@ int main()
             printf("failed to recv data: %ld\n", WSAGetLastError());
             return 1;
         }
-
-        printf("\n-> Received %d bytes, content:\n===\n%s\n===\n", req, buffer);
+        if (req == 0)
+            printf("%ld\n", req);
+        else
+            printf("\n-> Received %d bytes, content:\n===\n%s\n===\n", req, buffer);
 
         // Hello, World!
         char *sendbuf = "HTTP/1.1 200 OK\nServer: HGanyu\nConnection: keep-alive\nContent-Length: 12\n\nHello, User!";
@@ -133,21 +133,20 @@ int main()
             printf("failed to send data: %ld\n", WSAGetLastError());
             return 1;
         }
-    }
-
-    // Shutdown the connection
-    iResult = shutdown(accept_socket, SD_SEND);
-    if (iResult == SOCKET_ERROR)
-    {
-        printf("shutdown failed with error: %ld\n", WSAGetLastError());
+        // Shutdown the connection
+        iResult = shutdown(accept_socket, SD_SEND);
+        if (iResult == SOCKET_ERROR)
+        {
+            printf("shutdown failed with error: %ld\n", WSAGetLastError());
+            closesocket(accept_socket);
+            WSACleanup();
+            return 1;
+        }
         closesocket(accept_socket);
-        WSACleanup();
-        return 1;
     }
 
     _Log("WSAStartup() Closed");
     closesocket(listen_socket);
-    closesocket(accept_socket);
     WSACleanup();
     return 0;
 }
